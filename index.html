@@ -171,7 +171,7 @@ const IDEAS = {
   tenantwatch:{
     name:"TenantWatch", eyebrow:"Microsoft 365 · early access",
     h:"You're paying for Microsoft 365 seats nobody uses.",
-    sub:"A weekly readout of wasted licenses, security drift, and expiring renewals — for the solo admin who's also the whole IT department.",
+    sub:"TenantWatch scans your Microsoft 365 tenant every week and tells you which licenses are wasted, which accounts skip MFA, and what's about to expire — all in one short email.",
     target:"tenant: acme.onmicrosoft.com",
     rows:[
       {s:"warn",l:"Unused licenses",v:"14 · $1,260/mo"},
@@ -184,7 +184,7 @@ const IDEAS = {
   labdoctor:{
     name:"LabDoctor", eyebrow:"Self-hosted · early access",
     h:"Your homelab broke. Here's exactly why.",
-    sub:"AI-powered monitoring for self-hosters. It watches your services and tells you the fix — not just that something's down.",
+    sub:"LabDoctor watches the services running on your home server and, when one falls over, tells you what broke and how to fix it — not just that it's down.",
     target:"host: homelab-01",
     rows:[
       {s:"fail",l:"jellyfin",v:"OOMKilled 3× / 1h"},
@@ -197,7 +197,7 @@ const IDEAS = {
   deadmanscript:{
     name:"DeadManScript", eyebrow:"Automation · early access",
     h:"Your nightly script died 6 days ago. Nobody told you.",
-    sub:"Run PowerShell on a schedule in the cloud and get pinged the second a job fails — with an AI read on what broke.",
+    sub:"DeadManScript runs your PowerShell jobs on a schedule in the cloud and pings you the instant one fails — with a plain-English read on what went wrong.",
     target:"job: backup-nightly.ps1",
     rows:[
       {s:"fail",l:"Last successful run",v:"6 days ago"},
@@ -210,7 +210,7 @@ const IDEAS = {
   expiryhawk:{
     name:"ExpiryHawk", eyebrow:"Monitoring · early access",
     h:"Never get paged for an expired cert again.",
-    sub:"One panel watching every cert, domain, license, and API key you own. It nags you before they lapse — not after.",
+    sub:"ExpiryHawk tracks every certificate, domain, license, and API key you own, and warns you days before any of them lapse — never after.",
     target:"watching 27 assets",
     rows:[
       {s:"fail",l:"*.acme.io TLS",v:"expires 3d"},
@@ -223,7 +223,7 @@ const IDEAS = {
   restorecheck:{
     name:"RestoreCheck", eyebrow:"Backups · early access",
     h:"You have backups. They might not actually restore.",
-    sub:"Automated restore-testing that proves your backups work — before the day you bet everything on them.",
+    sub:"RestoreCheck automatically test-restores your backups on a schedule and tells you whether they'd actually come back — before the day you're betting everything on them.",
     target:"repo: veeam-prod",
     rows:[
       {s:"fail",l:"Last restore test",v:"FAILED"},
@@ -236,7 +236,7 @@ const IDEAS = {
   scriptvault:{
     name:"ScriptVault", eyebrow:"PowerShell · early access",
     h:"Every PowerShell script you've written, finally findable.",
-    sub:"A searchable vault that documents every script, flags the dangerous ones, and writes new ones in your style.",
+    sub:"ScriptVault indexes every PowerShell script you've got and makes them searchable by what they actually do — and flags the destructive ones before you hit enter.",
     target:"vault: \\\\scripts",
     rows:[
       {s:"ok",l:"Scripts indexed",v:"247"},
@@ -249,7 +249,7 @@ const IDEAS = {
   runbookgen:{
     name:"RunbookGen", eyebrow:"IT docs · early access",
     h:"The runbooks you never write, written for you.",
-    sub:"AI turns the work you already did into audit-ready runbooks and change docs. Zero extra effort.",
+    sub:"RunbookGen turns the tickets and changes you've already closed into audit-ready runbooks and change docs — automatically, with zero extra writing.",
     target:"source: ServiceNow",
     rows:[
       {s:"ok",l:"Changes documented",v:"14 / 14"},
@@ -262,7 +262,7 @@ const IDEAS = {
   kinkeeper:{
     name:"KinKeeper", eyebrow:"Family IT · early access",
     h:"Be the family IT hero without the house calls.",
-    sub:"Quietly keep an eye on your family's PCs and get a heads-up before something actually breaks.",
+    sub:"KinKeeper quietly monitors your family's PCs and gives you a heads-up — failing drive, pending updates, dead antivirus — before it becomes a panicked phone call.",
     target:"device: Dad's PC",
     rows:[
       {s:"fail",l:"Drive health (SMART)",v:"failing"},
