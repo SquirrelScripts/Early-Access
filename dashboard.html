@@ -15,6 +15,7 @@
     --fg:#E2E9E6;
     --fg-dim:#8497a0;
     --ok:#37B98A;
+    --fail:#E2615C;
     --views:#3987e5;   /* series: views  (validated vs --ink-2) */
     --signups:#2da178; /* series: signups (validated vs --ink-2) */
     --track:rgba(226,233,230,.06);
@@ -36,11 +37,29 @@
   .mark{display:flex;align-items:center;gap:10px;font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:-.01em;font-size:1.12rem}
   .mark .pulse{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(55,185,138,.55);animation:beat 2.4s infinite}
   @keyframes beat{0%{box-shadow:0 0 0 0 rgba(55,185,138,.55)}70%{box-shadow:0 0 0 9px rgba(55,185,138,0)}100%{box-shadow:0 0 0 0 rgba(55,185,138,0)}}
-  .meta{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--fg-dim);letter-spacing:.04em;text-transform:uppercase}
+  .meta{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--fg-dim);letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:14px}
 
   main{padding:40px 0 80px}
   h1{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.6rem;letter-spacing:-.02em;color:#fff}
   .subhead{color:var(--fg-dim);margin:4px 0 28px}
+
+  /* ---- login gate ---- */
+  .gate{max-width:400px;margin:9vh auto 0}
+  .gate .panel{padding:28px}
+  .gate h1{font-size:1.3rem;margin-bottom:4px}
+  .gate p{color:var(--fg-dim);font-size:.92rem;margin-bottom:22px}
+  .gate label{display:block;font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-dim);margin:14px 0 6px}
+  .gate input{
+    width:100%;background:var(--ink);border:1px solid var(--line);border-radius:8px;
+    color:var(--fg);font:inherit;font-size:.95rem;padding:10px 12px;outline:none;
+  }
+  .gate input:focus{border-color:var(--ok)}
+  .gate button{
+    width:100%;margin-top:20px;padding:12px;border:none;border-radius:8px;cursor:pointer;
+    background:var(--ok);color:#07211a;font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.98rem;
+  }
+  .gate button:disabled{opacity:.6;cursor:wait}
+  .gate .err{color:var(--fail);font-size:.85rem;margin-top:12px;min-height:1.4em}
 
   .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:34px}
   .tile{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
@@ -48,6 +67,7 @@
   .tile .value{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:2.1rem;line-height:1.2;color:#fff;margin-top:4px}
 
   .panel{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 14px}
+  .panel + .panel{margin-top:20px}
   .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
   .panel-head h2{font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:600;letter-spacing:-.01em}
   .legend{display:flex;gap:18px;font-size:.82rem;color:var(--fg-dim)}
@@ -71,14 +91,22 @@
   .bar.views{background:var(--views)}
   .bar.signups{background:var(--signups)}
 
+  .sig{display:grid;grid-template-columns:170px 130px 1fr;gap:0 14px;padding:9px 6px;font-size:.88rem;border-radius:8px}
+  .sig + .sig{border-top:1px solid rgba(36,52,58,.6)}
+  .sig:hover{background:rgba(226,233,230,.04)}
+  .sig.head{color:var(--fg-dim);font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;border-top:none}
+  .sig .when{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;color:var(--fg-dim);font-size:.8rem}
+  .sig .mail{font-family:"IBM Plex Mono",monospace;font-size:.84rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
   .note{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--fg-dim);margin-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
-  button.refresh{
+  button.ghost{
     font-family:"IBM Plex Mono",monospace;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;
     background:none;border:1px solid var(--line);border-radius:8px;color:var(--fg);
     padding:6px 14px;cursor:pointer;
   }
-  button.refresh:hover{border-color:var(--ok);color:var(--ok)}
+  button.ghost:hover{border-color:var(--ok);color:var(--ok)}
   .state{padding:26px 6px;color:var(--fg-dim);font-size:.92rem}
+  [hidden]{display:none !important}
 
   .tooltip{
     position:fixed;pointer-events:none;z-index:10;display:none;
@@ -93,6 +121,7 @@
   @media (max-width:720px){
     .tiles{grid-template-columns:1fr}
     .row{grid-template-columns:110px 1fr 52px 52px 52px;gap:0 8px}
+    .sig{grid-template-columns:120px 100px 1fr;gap:0 8px}
     .idea{font-size:.85rem}
     .num{font-size:.78rem}
   }
@@ -102,10 +131,28 @@
 
 <header class="topbar"><div class="wrap">
   <div class="mark"><span class="pulse"></span>Signal</div>
-  <div class="meta">smoke-test dashboard</div>
+  <div class="meta"><span>smoke-test dashboard</span><button class="ghost" type="button" id="signout" hidden>Sign out</button></div>
 </div></header>
 
-<main><div class="wrap">
+<!-- ---- login gate (client-side UI only; the real gate is Supabase: the
+     stats view and events table refuse to return rows without a valid
+     session for the owner's account) ---- -->
+<div class="gate" id="gate" hidden>
+  <div class="panel">
+    <h1>Owner sign-in</h1>
+    <p>This dashboard is private. Sign in with your account.</p>
+    <form id="login-form">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" required />
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required />
+      <button type="submit" id="login-btn">Sign in</button>
+      <div class="err" id="login-err"></div>
+    </form>
+  </div>
+</div>
+
+<main id="app" hidden><div class="wrap">
   <h1>Views &amp; signups</h1>
   <p class="subhead">Live counts from the early-access smoke test, per idea.</p>
 
@@ -126,8 +173,13 @@
     <div id="rows"><div class="state">Loading…</div></div>
     <div class="note">
       <span id="stamp"></span>
-      <button class="refresh" type="button" id="refresh">Refresh</button>
+      <button class="ghost" type="button" id="refresh">Refresh</button>
     </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head"><h2>Latest signups</h2></div>
+    <div id="signups"><div class="state">Loading…</div></div>
   </section>
 </div></main>
 
@@ -136,6 +188,7 @@
 <script>
 const SUPABASE_URL = "https://vgwpvjiuqdadycwnjcla.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnd3B2aml1cWRhZHljd25qY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MDcyMDIsImV4cCI6MjA5ODE4MzIwMn0.zuSwBGROU--kdl2xSwGBPmUilnI_E48FJywZBhAmUfA";
+const SESSION_KEY = "smoke_dash_session";
 
 /* Keep in sync with the IDEAS object in index.html */
 const IDEA_NAMES = {
@@ -151,15 +204,99 @@ const IDEA_NAMES = {
 
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pct = (a,b) => b ? Math.round(a/b*100) + "%" : "—";
+const $ = id => document.getElementById(id);
 
-async function loadStats(){
-  const res = await fetch(SUPABASE_URL + "/rest/v1/smoke_stats?select=page,event,n", {
-    headers:{ "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer "+SUPABASE_ANON_KEY }
+/* ---- session handling ---- */
+function getSession(){
+  try{ return JSON.parse(localStorage.getItem(SESSION_KEY)) || null; }catch(e){ return null; }
+}
+function setSession(s){
+  if(s) localStorage.setItem(SESSION_KEY, JSON.stringify(s));
+  else localStorage.removeItem(SESSION_KEY);
+}
+
+async function authRequest(grant, body){
+  const res = await fetch(SUPABASE_URL + "/auth/v1/token?grant_type=" + grant, {
+    method:"POST",
+    headers:{ "apikey":SUPABASE_ANON_KEY, "Content-Type":"application/json" },
+    body:JSON.stringify(body)
   });
+  const data = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error_description || data.msg || "Sign-in failed (HTTP " + res.status + ")");
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+    expires_at: Date.now() + (data.expires_in || 3600) * 1000
+  };
+}
+
+async function ensureSession(){
+  let s = getSession();
+  if(!s) return null;
+  if(Date.now() < s.expires_at - 60000) return s;
+  try{
+    s = await authRequest("refresh_token", { refresh_token: s.refresh_token });
+    setSession(s);
+    return s;
+  }catch(e){
+    setSession(null);
+    return null;
+  }
+}
+
+async function api(path){
+  const s = await ensureSession();
+  if(!s) throw Object.assign(new Error("Not signed in"), {auth:true});
+  const res = await fetch(SUPABASE_URL + path, {
+    headers:{ "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer " + s.access_token }
+  });
+  if(res.status === 401){ setSession(null); throw Object.assign(new Error("Session expired"), {auth:true}); }
   if(!res.ok) throw new Error("HTTP " + res.status);
   return res.json();
 }
 
+/* ---- views: gate vs app ---- */
+function showGate(msg){
+  $("app").hidden = true;
+  $("signout").hidden = true;
+  $("gate").hidden = false;
+  if(msg) $("login-err").textContent = msg;
+}
+function showApp(){
+  $("gate").hidden = true;
+  $("app").hidden = false;
+  $("signout").hidden = false;
+}
+
+$("login-form").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const btn = $("login-btn");
+  btn.disabled = true;
+  $("login-err").textContent = "";
+  try{
+    const s = await authRequest("password", { email:$("email").value.trim(), password:$("password").value });
+    setSession(s);
+    $("password").value = "";
+    showApp();
+    refresh();
+  }catch(err){
+    $("login-err").textContent = err.message;
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+$("signout").addEventListener("click", async ()=>{
+  const s = getSession();
+  setSession(null);
+  if(s) fetch(SUPABASE_URL + "/auth/v1/logout", {
+    method:"POST",
+    headers:{ "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer " + s.access_token }
+  }).catch(()=>{});
+  showGate();
+});
+
+/* ---- stats ---- */
 function buildRows(stats){
   const byPage = {};
   for(const slug of Object.keys(IDEA_NAMES)) byPage[slug] = {views:0, signups:0};
@@ -176,14 +313,14 @@ function buildRows(stats){
 function render(rows){
   const totalViews = rows.reduce((s,r)=>s+r.views,0);
   const totalSignups = rows.reduce((s,r)=>s+r.signups,0);
-  document.getElementById("t-views").textContent = totalViews;
-  document.getElementById("t-signups").textContent = totalSignups;
-  document.getElementById("t-conv").textContent = pct(totalSignups, totalViews);
+  $("t-views").textContent = totalViews;
+  $("t-signups").textContent = totalSignups;
+  $("t-conv").textContent = pct(totalSignups, totalViews);
 
   const max = Math.max(1, ...rows.map(r=>r.views), ...rows.map(r=>r.signups));
   const w = n => n ? Math.max(0.6, n/max*100) + "%" : "0";
 
-  document.getElementById("rows").innerHTML = `
+  $("rows").innerHTML = `
     <div class="row head"><span>Idea</span><span></span><span class="num">Views</span><span class="num">Signups</span><span class="num">Conv</span></div>
     ` + rows.map(r=>`
     <div class="row" data-name="${esc(r.name)}" data-views="${r.views}" data-signups="${r.signups}">
@@ -197,12 +334,27 @@ function render(rows){
       <span class="num dim">${pct(r.signups, r.views)}</span>
     </div>`).join("");
 
-  document.getElementById("stamp").textContent = "updated " + new Date().toLocaleTimeString();
+  $("stamp").textContent = "updated " + new Date().toLocaleTimeString();
+}
+
+function renderSignups(list){
+  if(!list.length){
+    $("signups").innerHTML = `<div class="state">No signups yet.</div>`;
+    return;
+  }
+  $("signups").innerHTML = `
+    <div class="sig head"><span>When</span><span>Idea</span><span>Email</span></div>
+    ` + list.map(s=>`
+    <div class="sig">
+      <span class="when">${esc(new Date(s.created_at).toLocaleString())}</span>
+      <span>${esc(IDEA_NAMES[s.page] || s.page)}</span>
+      <span class="mail">${esc(s.email || "—")}</span>
+    </div>`).join("");
 }
 
 /* hover tooltip */
-const tip = document.getElementById("tooltip");
-document.getElementById("rows").addEventListener("mousemove", e=>{
+const tip = $("tooltip");
+$("rows").addEventListener("mousemove", e=>{
   const row = e.target.closest(".row:not(.head)");
   if(!row){ tip.style.display = "none"; return; }
   tip.innerHTML = `<b>${row.dataset.name}</b>
@@ -214,17 +366,29 @@ document.getElementById("rows").addEventListener("mousemove", e=>{
   tip.style.left = Math.min(e.clientX + pad, innerWidth - tw - 8) + "px";
   tip.style.top = (e.clientY - th - pad < 8 ? e.clientY + pad : e.clientY - th - pad) + "px";
 });
-document.getElementById("rows").addEventListener("mouseleave", ()=>{ tip.style.display = "none"; });
+$("rows").addEventListener("mouseleave", ()=>{ tip.style.display = "none"; });
 
 async function refresh(){
   try{
-    render(buildRows(await loadStats()));
+    const [stats, signups] = await Promise.all([
+      api("/rest/v1/smoke_stats?select=page,event,n"),
+      api("/rest/v1/smoke_events?event=eq.signup&select=created_at,page,email&order=created_at.desc&limit=25")
+    ]);
+    render(buildRows(stats));
+    renderSignups(signups);
   }catch(e){
-    document.getElementById("rows").innerHTML = `<div class="state">Couldn't load stats (${esc(e.message)}). Try refresh.</div>`;
+    if(e.auth){ showGate(); return; }
+    $("rows").innerHTML = `<div class="state">Couldn't load stats (${esc(e.message)}). Try refresh.</div>`;
+    $("signups").innerHTML = `<div class="state">—</div>`;
   }
 }
-document.getElementById("refresh").addEventListener("click", refresh);
-refresh();
+$("refresh").addEventListener("click", refresh);
+
+/* boot */
+(async ()=>{
+  if(await ensureSession()){ showApp(); refresh(); }
+  else showGate();
+})();
 </script>
 </body>
 </html>
