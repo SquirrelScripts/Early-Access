@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Signal — early access dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#0F1719;
+    --ink-2:#162226;
+    --line:#24343a;
+    --fg:#E2E9E6;
+    --fg-dim:#8497a0;
+    --ok:#37B98A;
+    --views:#3987e5;   /* series: views  (validated vs --ink-2) */
+    --signups:#2da178; /* series: signups (validated vs --ink-2) */
+    --track:rgba(226,233,230,.06);
+    --radius:14px;
+    --maxw:960px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--ink);
+    color:var(--fg);
+    font-family:"IBM Plex Sans",system-ui,sans-serif;
+    font-size:16px;line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+
+  .topbar{border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .mark{display:flex;align-items:center;gap:10px;font-family:"Space Grotesk",sans-serif;font-weight:700;letter-spacing:-.01em;font-size:1.12rem}
+  .mark .pulse{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(55,185,138,.55);animation:beat 2.4s infinite}
+  @keyframes beat{0%{box-shadow:0 0 0 0 rgba(55,185,138,.55)}70%{box-shadow:0 0 0 9px rgba(55,185,138,0)}100%{box-shadow:0 0 0 0 rgba(55,185,138,0)}}
+  .meta{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--fg-dim);letter-spacing:.04em;text-transform:uppercase}
+
+  main{padding:40px 0 80px}
+  h1{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:1.6rem;letter-spacing:-.02em;color:#fff}
+  .subhead{color:var(--fg-dim);margin:4px 0 28px}
+
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:34px}
+  .tile{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px}
+  .tile .label{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--fg-dim);letter-spacing:.1em;text-transform:uppercase}
+  .tile .value{font-family:"Space Grotesk",sans-serif;font-weight:700;font-size:2.1rem;line-height:1.2;color:#fff;margin-top:4px}
+
+  .panel{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--radius);padding:22px 22px 14px}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  .panel-head h2{font-family:"Space Grotesk",sans-serif;font-size:1.05rem;font-weight:600;letter-spacing:-.01em}
+  .legend{display:flex;gap:18px;font-size:.82rem;color:var(--fg-dim)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .legend .k-views i{background:var(--views)}
+  .legend .k-signups i{background:var(--signups)}
+
+  .row{display:grid;grid-template-columns:150px 1fr 64px 64px 64px;gap:0 14px;align-items:center;padding:10px 6px;border-radius:8px}
+  .row:hover{background:rgba(226,233,230,.04)}
+  .row + .row{border-top:1px solid rgba(36,52,58,.6)}
+  .row.head{color:var(--fg-dim);font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;border-top:none}
+  .row.head:hover{background:none}
+  .idea{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .num{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-size:.88rem;text-align:right}
+  .num.dim{color:var(--fg-dim)}
+
+  .bars{display:flex;flex-direction:column;gap:2px}
+  .track{position:relative;height:10px;background:var(--track);border-radius:0 4px 4px 0}
+  .bar{position:absolute;inset:0 auto 0 0;border-radius:0 4px 4px 0;min-width:0}
+  .bar.views{background:var(--views)}
+  .bar.signups{background:var(--signups)}
+
+  .note{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--fg-dim);margin-top:14px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  button.refresh{
+    font-family:"IBM Plex Mono",monospace;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;
+    background:none;border:1px solid var(--line);border-radius:8px;color:var(--fg);
+    padding:6px 14px;cursor:pointer;
+  }
+  button.refresh:hover{border-color:var(--ok);color:var(--ok)}
+  .state{padding:26px 6px;color:var(--fg-dim);font-size:.92rem}
+
+  .tooltip{
+    position:fixed;pointer-events:none;z-index:10;display:none;
+    background:#0b1214;border:1px solid var(--line);border-radius:8px;
+    padding:8px 12px;font-size:.82rem;line-height:1.5;box-shadow:0 6px 20px rgba(0,0,0,.5);
+  }
+  .tooltip b{font-family:"Space Grotesk",sans-serif}
+  .tooltip .tt-line{display:flex;align-items:center;gap:7px;color:var(--fg-dim)}
+  .tooltip .tt-line i{width:8px;height:8px;border-radius:2px;display:inline-block}
+  .tooltip .tt-line .v{color:var(--fg);font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;margin-left:auto;padding-left:14px}
+
+  @media (max-width:720px){
+    .tiles{grid-template-columns:1fr}
+    .row{grid-template-columns:110px 1fr 52px 52px 52px;gap:0 8px}
+    .idea{font-size:.85rem}
+    .num{font-size:.78rem}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar"><div class="wrap">
+  <div class="mark"><span class="pulse"></span>Signal</div>
+  <div class="meta">smoke-test dashboard</div>
+</div></header>
+
+<main><div class="wrap">
+  <h1>Views &amp; signups</h1>
+  <p class="subhead">Live counts from the early-access smoke test, per idea.</p>
+
+  <div class="tiles">
+    <div class="tile"><div class="label">Total views</div><div class="value" id="t-views">—</div></div>
+    <div class="tile"><div class="label">Total signups</div><div class="value" id="t-signups">—</div></div>
+    <div class="tile"><div class="label">Conversion</div><div class="value" id="t-conv">—</div></div>
+  </div>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>By idea</h2>
+      <div class="legend">
+        <span class="k-views"><i></i>Views</span>
+        <span class="k-signups"><i></i>Signups</span>
+      </div>
+    </div>
+    <div id="rows"><div class="state">Loading…</div></div>
+    <div class="note">
+      <span id="stamp"></span>
+      <button class="refresh" type="button" id="refresh">Refresh</button>
+    </div>
+  </section>
+</div></main>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const SUPABASE_URL = "https://vgwpvjiuqdadycwnjcla.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnd3B2aml1cWRhZHljd25qY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MDcyMDIsImV4cCI6MjA5ODE4MzIwMn0.zuSwBGROU--kdl2xSwGBPmUilnI_E48FJywZBhAmUfA";
+
+/* Keep in sync with the IDEAS object in index.html */
+const IDEA_NAMES = {
+  tenantwatch:"TenantWatch",
+  labdoctor:"LabDoctor",
+  deadmanscript:"DeadManScript",
+  expiryhawk:"ExpiryHawk",
+  restorecheck:"RestoreCheck",
+  scriptvault:"ScriptVault",
+  runbookgen:"RunbookGen",
+  kinkeeper:"KinKeeper",
+};
+
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct = (a,b) => b ? Math.round(a/b*100) + "%" : "—";
+
+async function loadStats(){
+  const res = await fetch(SUPABASE_URL + "/rest/v1/smoke_stats?select=page,event,n", {
+    headers:{ "apikey":SUPABASE_ANON_KEY, "Authorization":"Bearer "+SUPABASE_ANON_KEY }
+  });
+  if(!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
+}
+
+function buildRows(stats){
+  const byPage = {};
+  for(const slug of Object.keys(IDEA_NAMES)) byPage[slug] = {views:0, signups:0};
+  for(const s of stats){
+    const p = byPage[s.page] || (byPage[s.page] = {views:0, signups:0});
+    if(s.event === "view") p.views += s.n;
+    else if(s.event === "signup") p.signups += s.n;
+  }
+  return Object.entries(byPage)
+    .map(([slug,c]) => ({slug, name: IDEA_NAMES[slug] || slug, ...c}))
+    .sort((a,b) => b.views - a.views || b.signups - a.signups || a.name.localeCompare(b.name));
+}
+
+function render(rows){
+  const totalViews = rows.reduce((s,r)=>s+r.views,0);
+  const totalSignups = rows.reduce((s,r)=>s+r.signups,0);
+  document.getElementById("t-views").textContent = totalViews;
+  document.getElementById("t-signups").textContent = totalSignups;
+  document.getElementById("t-conv").textContent = pct(totalSignups, totalViews);
+
+  const max = Math.max(1, ...rows.map(r=>r.views), ...rows.map(r=>r.signups));
+  const w = n => n ? Math.max(0.6, n/max*100) + "%" : "0";
+
+  document.getElementById("rows").innerHTML = `
+    <div class="row head"><span>Idea</span><span></span><span class="num">Views</span><span class="num">Signups</span><span class="num">Conv</span></div>
+    ` + rows.map(r=>`
+    <div class="row" data-name="${esc(r.name)}" data-views="${r.views}" data-signups="${r.signups}">
+      <span class="idea">${esc(r.name)}</span>
+      <span class="bars" aria-hidden="true">
+        <span class="track"><span class="bar views" style="width:${w(r.views)}"></span></span>
+        <span class="track"><span class="bar signups" style="width:${w(r.signups)}"></span></span>
+      </span>
+      <span class="num">${r.views}</span>
+      <span class="num">${r.signups}</span>
+      <span class="num dim">${pct(r.signups, r.views)}</span>
+    </div>`).join("");
+
+  document.getElementById("stamp").textContent = "updated " + new Date().toLocaleTimeString();
+}
+
+/* hover tooltip */
+const tip = document.getElementById("tooltip");
+document.getElementById("rows").addEventListener("mousemove", e=>{
+  const row = e.target.closest(".row:not(.head)");
+  if(!row){ tip.style.display = "none"; return; }
+  tip.innerHTML = `<b>${row.dataset.name}</b>
+    <div class="tt-line"><i style="background:var(--views)"></i>Views<span class="v">${row.dataset.views}</span></div>
+    <div class="tt-line"><i style="background:var(--signups)"></i>Signups<span class="v">${row.dataset.signups}</span></div>
+    <div class="tt-line">Conversion<span class="v">${pct(+row.dataset.signups, +row.dataset.views)}</span></div>`;
+  tip.style.display = "block";
+  const pad = 14, tw = tip.offsetWidth, th = tip.offsetHeight;
+  tip.style.left = Math.min(e.clientX + pad, innerWidth - tw - 8) + "px";
+  tip.style.top = (e.clientY - th - pad < 8 ? e.clientY + pad : e.clientY - th - pad) + "px";
+});
+document.getElementById("rows").addEventListener("mouseleave", ()=>{ tip.style.display = "none"; });
+
+async function refresh(){
+  try{
+    render(buildRows(await loadStats()));
+  }catch(e){
+    document.getElementById("rows").innerHTML = `<div class="state">Couldn't load stats (${esc(e.message)}). Try refresh.</div>`;
+  }
+}
+document.getElementById("refresh").addEventListener("click", refresh);
+refresh();
+</script>
+</body>
+</html>
