@@ -275,13 +275,13 @@ const IDEAS = {
 };
 
 /* ---- Supabase capture (fill these in; see DEPLOY.md) ---- */
-const SUPABASE_URL = "https://iefltncxyarhfguxctxe.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllZmx0bmN4eWFyaGZndXhjdHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4MjY0NDAsImV4cCI6MjA5NzQwMjQ0MH0.OK4lkUM9-IX1YRlaIMDAw_EH1EYQif5vDeCfhhcHfBg";
+const SUPABASE_URL = "https://vgwpvjiuqdadycwnjcla.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnd3B2aml1cWRhZHljd25qY2xhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2MDcyMDIsImV4cCI6MjA5ODE4MzIwMn0.zuSwBGROU--kdl2xSwGBPmUilnI_E48FJywZBhAmUfA";
 
 async function logEvent(slug, type, email){
   if(!SUPABASE_URL || !SUPABASE_ANON_KEY) { console.warn("[smoke] Supabase not configured — event not stored:", {slug,type,email}); return; }
   try{
-    await fetch(SUPABASE_URL + "/rest/v1/events", {
+    await fetch(SUPABASE_URL + "/rest/v1/smoke_events", {
       method:"POST",
       headers:{
         "apikey":SUPABASE_ANON_KEY,
@@ -289,7 +289,7 @@ async function logEvent(slug, type, email){
         "Content-Type":"application/json",
         "Prefer":"return=minimal"
       },
-      body:JSON.stringify({ slug, type, email:email||null, referrer:document.referrer||null })
+      body:JSON.stringify({ page:slug, event:type, email:email||null, meta:{ referrer:document.referrer||null } })
     });
   }catch(e){ console.warn("[smoke] event failed", e); }
 }
